@@ -14,6 +14,7 @@
     "try-run-B": "node harness/03-gate/gate.js --task cart --file demo/recorded-2026-11-08/cart-run-B.js --fn tinhTien",
     "try:without": "bash demo/setup-try.sh without",
     "try:with": "bash demo/setup-try.sh with",
+    "compare": "node demo/compare.js",
     "demo": "bash demo/replay.sh",
     "demo:live": "bash demo/run-live.sh"
   }

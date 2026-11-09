@@ -21,6 +21,7 @@ npm test            # gate: 16 trường hợp của 3 đầu việc, trả mã 
 npm run try-run-A   # đem code AI tự chấm "đạt 7/7" qua cửa kiểm → HỎNG, thoát 1
 npm run verify      # 9 lượt soát: 3 đầu việc × 3 kiểu lỗi
 npm run check-all    # cửa kiểm của cả repo — thứ agent phải qua mới được báo xong
+npm run compare      # bảng hai cột: cách 1 vs cách 2 trên một màn hình
 ```
 
 **Tự thử bằng AI của mình** — hai lệnh này chép đề bài ra thư mục sạch **ngoài repo** rồi in

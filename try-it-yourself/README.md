@@ -21,6 +21,15 @@ npm run try:without     # lần KHÔNG có cửa kiểm
 npm run try:with        # lần CÓ test.js do người viết
 ```
 
+## Chạy xong cả hai thì xem khác biệt trên một màn hình
+
+```bash
+npm run compare
+```
+
+Lệnh này tự lấy kết quả ở `/tmp/harness-try-without` và `/tmp/harness-try-with`, chạy cửa kiểm
+trên cả hai, rồi in một bảng hai cột. Chưa chạy thử thì nó dùng bản ghi 08/11.
+
 ## Lần 1 — không có cửa kiểm
 
 Làm theo ba bước lệnh in ra. Khi AI báo xong, **nhìn ba chỗ** trước khi chạy cửa kiểm:
