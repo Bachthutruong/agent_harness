@@ -41,4 +41,4 @@ echo " ĐỐI CHỨNG — đem code LẦN A qua cửa kiểm do NGƯỜI viết"
 echo "=============================================================="
 grep -q 'module.exports' "$TMP/lan-A/giohang.js" || \
   printf '\nmodule.exports = { tinhTien };\n' >> "$TMP/lan-A/giohang.js"
-node "$R/harness/03-gate/gate.js" "$TMP/lan-A/giohang.js"
+node "$R/harness/03-gate/gate.js" --viec gio-hang --file "$TMP/lan-A/giohang.js"

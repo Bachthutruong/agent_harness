@@ -7,10 +7,11 @@
   "scripts": {
     "test": "node harness/03-gate/gate.js",
     "gate": "node harness/03-gate/gate.js",
+    "cua-kiem": "bash harness/03-gate/cua-kiem.sh",
     "verify": "node harness/04-verify/verify.js",
     "budget": "node harness/06-budget/budget.js --giay 30 --lan 2 -- npm test",
-    "thu-lan-A": "node harness/03-gate/gate.js demo/ket-qua-08-11-2026/giohang-lan-A.js",
-    "thu-lan-B": "node harness/03-gate/gate.js demo/ket-qua-08-11-2026/giohang-lan-B.js",
+    "thu-lan-A": "node harness/03-gate/gate.js --viec gio-hang --file demo/ket-qua-08-11-2026/giohang-lan-A.js",
+    "thu-lan-B": "node harness/03-gate/gate.js --viec gio-hang --file demo/ket-qua-08-11-2026/giohang-lan-B.js",
     "demo": "bash demo/xem-lai.sh",
     "demo:that": "bash demo/chay-demo.sh"
   }

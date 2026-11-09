@@ -17,9 +17,10 @@ git clone https://github.com/Bachthutruong/agent_harness.git
 cd agent_harness
 
 npm run demo        # phát lại lần chạy thật — KHÔNG cần AI, không cần mạng
-npm test            # cửa kiểm: chạy 5 trường hợp, trả mã thoát 0/1
+npm test            # gate: 16 trường hợp của 3 đầu việc, trả mã thoát 0/1
 npm run thu-lan-A   # đem code AI tự chấm "đạt 7/7" qua cửa kiểm → HỎNG, thoát 1
-npm run verify      # ba lượt soát, mỗi lượt tìm một kiểu lỗi
+npm run verify      # 9 lượt soát: 3 đầu việc × 3 kiểu lỗi
+npm run cua-kiem    # cửa kiểm của cả repo — thứ agent phải qua mới được báo xong
 ```
 
 **Tự thử bằng AI của mình:** mở codex / Claude Code / Cursor ngay trong
@@ -57,36 +58,77 @@ Mỗi thư mục là một thành phần, chạy được độc lập. Không c
 
 | | Thành phần | Trả lời câu | Ở đâu |
 | --- | --- | --- | --- |
-| 01 | **Context** | ai quyết phải thử trường hợp nào | [`harness/01-context/truong-hop.js`](harness/01-context/truong-hop.js) |
+| 01 | **Context** | ai quyết phải thử trường hợp nào | [`harness/01-context/cong-viec/`](harness/01-context/cong-viec) |
 | 02 | **Tool** | ai quyết AI được chạy lệnh gì | [`harness/02-tool/chay-lenh.sh`](harness/02-tool/chay-lenh.sh) |
 | 03 | **Gate** | ai chạy thử trước khi người xem | [`harness/03-gate/gate.js`](harness/03-gate/gate.js) |
 | 04 | **Verify** | ai soát lại để tìm lỗi | [`harness/04-verify/verify.js`](harness/04-verify/verify.js) |
 | 05 | **Rollback** | ai xoá bỏ được nếu đã sai | [`harness/05-rollback/snapshot.sh`](harness/05-rollback/snapshot.sh) |
 | 06 | **Budget** | ai bắt dừng khi quá tốn | [`harness/06-budget/budget.js`](harness/06-budget/budget.js) |
 
-`01-context/truong-hop.js` là **source of truth**: gate và verify đều đọc lại từ đó, không
-thành phần nào tự chế danh sách riêng.
+`01-context/cong-viec/` là **source of truth**: gate và verify đều nạp từ đó, không thành phần
+nào tự chế danh sách riêng.
 
-Chi tiết từng thành phần và cách lắp vào dự án thật: [`harness/README.md`](harness/README.md).
+Chi tiết từng thành phần: [`harness/README.md`](harness/README.md).
+
+## Nhiều đầu việc thì sao — mỗi việc một harness à?
+
+**Không.** Bộ máy viết **một lần**. Mỗi đầu việc chỉ thêm **một file dữ liệu**.
+
+| | Viết mấy lần | Khi có đầu việc mới |
+| --- | --- | --- |
+| 02 Tool · 03 Gate · 04 Verify · 05 Rollback · 06 Budget | **một lần cho cả repo** | không mở ra nữa |
+| 01 Context — `cong-viec/<tên>.cases.js` | mỗi đầu việc một file | thêm đúng **một** file |
+
+Repo này đang có **ba** đầu việc — giỏ hàng, mã giảm giá, phí ship — hàm một tham số lẫn hai
+tham số, chạy chung một gate:
+
+```
+$ npm test
+--- Giỏ hàng — giảm 10% từ 1.000.000đ  [gio-hang]
+--- Mã giảm giá — áp mã vào đơn  [ma-giam-gia]
+--- Phí ship — tính theo cân nặng và khu vực  [phi-ship]
+TAT CA DAT — 16 truong hop, 3 dau viec
+```
+
+Thêm đầu việc thứ tư: tạo `harness/01-context/cong-viec/abc.cases.js`. Hết. `gate.js` tự quét
+thư mục, `verify.js` cũng vậy.
+
+**Ở dự án thật, con số đó còn về gần 0.** Cửa kiểm là
+[`harness/03-gate/cua-kiem.sh`](harness/03-gate/cua-kiem.sh), và ở dự án thật nội dung nó thường
+không có dòng nào mới — chỉ là lệnh bạn đã chạy hằng ngày, nối lại, dừng ở lệnh đầu tiên thoát
+khác 0:
+
+```bash
+npm run typecheck && npm run lint && npm test
+```
+
+Thứ bạn "thêm cho mỗi task" chính là **test** — việc bạn vẫn làm. Harness không thay test
+framework. Nó làm cho test thành thứ **bắt buộc** với agent, thay vì một lời khuyên nó bỏ qua
+được.
 
 ## Thư mục
 
 ```
-harness/           sáu thành phần, mỗi cái chạy được một mình
-vi-du/giohang.js   chỗ AI ghi code vào — hiện là kết quả lần B
-thu-tai-nha/       hai thư mục để tự thử bằng AI của mình
-demo/              phát lại lần chạy thật + script chạy lại bằng codex
-trang/index.html   trang xem bằng mắt, mở bằng trình duyệt
+harness/
+  01-context/cong-viec/   MỘT file cho MỖI đầu việc — chỗ duy nhất phải thêm
+  02-tool … 06-budget/    bộ máy, viết một lần cho cả repo
+  03-gate/cua-kiem.sh     cửa kiểm của cả repo: nối các bước, dừng ở bước hỏng
+vi-du/                    chỗ AI ghi code vào (3 file, khớp 3 đầu việc)
+thu-tai-nha/              hai thư mục để tự thử bằng AI của mình
+demo/                     phát lại lần chạy thật + script chạy lại bằng codex
+trang/index.html          trang xem bằng mắt, mở bằng trình duyệt
 ```
 
 ## Lắp vào dự án thật
 
-1. Chép `harness/01-context/truong-hop.js`, thay danh sách bằng trường hợp của mình.
-   **Viết nó trước khi giao việc cho AI**, không phải sau.
-2. Cho agent chạy lệnh qua `harness/02-tool/chay-lenh.sh`, đừng cho nó shell trần.
-3. Đặt `npm test` (gate) vào CI, chặn merge khi thoát khác 0.
-4. Chụp dữ liệu bằng `05-rollback` trước mọi lần ghi.
-5. Bọc mọi lần gọi agent bằng `06-budget` để nó không chạy tới khi có người chặn tay.
+1. Sửa `harness/03-gate/cua-kiem.sh` thành lệnh kiểm của dự án bạn (`typecheck`, `lint`,
+   `test`). Đây là file **duy nhất** cần sửa một lần.
+2. Với mỗi đầu việc giao cho AI, viết trường hợp cần thử **trước khi giao** — bằng test
+   framework sẵn có, hoặc bằng một file trong `cong-viec/` nếu chưa có framework nào.
+3. Cho agent chạy lệnh qua `harness/02-tool/chay-lenh.sh`, đừng cho nó shell trần.
+4. Đặt `cua-kiem.sh` vào CI, chặn merge khi thoát khác 0.
+5. Chụp dữ liệu bằng `05-rollback` trước mọi lần ghi.
+6. Bọc mọi lần gọi agent bằng `06-budget` để nó không chạy tới khi có người chặn tay.
 
 ## Chạy lại ra kết quả khác thì sao
 

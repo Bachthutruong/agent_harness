@@ -2,13 +2,27 @@
 
 Mỗi thành phần là một file chạy được, không dependency. Đọc được hết trong 10 phút.
 
-## 01 · Context — `01-context/truong-hop.js`
+## 01 · Context — `01-context/cong-viec/*.cases.js`
 
-Danh sách trường hợp phải thử, **người viết trước khi giao việc**. Đây là source of truth:
-gate và verify đều `require` từ file này nên không có hai bản danh sách lệch nhau.
+Danh sách trường hợp phải thử, **người viết trước khi giao việc**. Source of truth: gate và
+verify đều nạp từ đây nên không bao giờ có hai bản danh sách lệch nhau.
 
-Dòng quan trọng nhất là dòng ghi một quyết định nghiệp vụ mà model không đoán được:
-`{ tien: 1000001, phaiTra: 900001, vi: 'TIỀN PHẢI LÀ SỐ NGUYÊN ĐỒNG' }`.
+**Một đầu việc = một file.** Thêm đầu việc mới thì thêm một file, không mở lại gate hay verify.
+
+```js
+module.exports = {
+  ten: 'Phí ship — tính theo cân nặng và khu vực',
+  module: '../../../vi-du/phiship.js',
+  ham: 'tinhPhiShip',
+  quyetDinh: 'Cân nặng làm tròn LÊN theo khối 500g, không làm tròn gần nhất.',
+  truongHop: [
+    { vao: [501, true], ra: 20000, vi: 'LÀM TRÒN LÊN — 501g tính thành 2 khối' },
+  ],
+};
+```
+
+`vao` là mảng tham số nên hàm mấy tham số cũng chạy được. Trường `quyetDinh` là chỗ ghi
+**quyết định nghiệp vụ model không đoán được** — thiếu nó là ra lỗi 900.000,9 đồng ở `demo/`.
 
 ## 02 · Tool — `02-tool/chay-lenh.sh`
 
@@ -27,11 +41,18 @@ Chạy toàn bộ trường hợp, in `DAT`/`HONG`, **thoát 0 hoặc 1**. Mã t
 không phải câu AI báo.
 
 ```bash
-node harness/03-gate/gate.js                                    # kiểm vi-du/giohang.js
-node harness/03-gate/gate.js duong/dan/file-khac.js             # kiểm file bất kỳ
+node harness/03-gate/gate.js                        # mọi đầu việc trong cong-viec/
+node harness/03-gate/gate.js --viec gio-hang        # một đầu việc
+node harness/03-gate/gate.js --viec gio-hang --file duong/dan/khac.js
 ```
 
 Mã thoát: `0` đạt hết · `1` có trường hợp hỏng · `2` không nạp được file.
+
+### `03-gate/cua-kiem.sh` — cửa kiểm của cả repo
+
+Nối các bước lại, dừng ở bước đầu tiên thoát khác 0. Ở dự án thật, nội dung nó là lệnh bạn đã
+chạy hằng ngày (`npm run typecheck`, `npm run lint`, `npm test`, `pytest -q`). **Đây là file
+duy nhất cần sửa một lần khi lắp harness vào dự án** — thêm đầu việc về sau không đụng tới nó.
 
 ## 04 · Verify — `04-verify/verify.js`
 
@@ -40,8 +61,10 @@ Ba lượt soát, mỗi lượt đi tìm **một kiểu lỗi khác nhau**:
 | Lượt | Tìm cái gì |
 | --- | --- |
 | Đúng chưa? | kết quả có khớp danh sách trường hợp không (chạy lại gate) |
-| An toàn chưa? | hàm tính tiền có gọi `eval`, `child_process`, `fs`, mạng, biến môi trường không |
+| An toàn chưa? | hàm có gọi `eval`, `child_process`, `fs`, mạng, biến môi trường không |
 | Chạy lại ra y hệt chưa? | cùng đầu vào có luôn ra cùng kết quả không |
+
+Chạy cho **mọi** đầu việc: `node harness/04-verify/verify.js`, hoặc một cái với `--viec <tên>`.
 
 Ba lượt **giống nhau** không bằng ba lượt tìm ba kiểu lỗi khác nhau. Hỏi *"cái này ổn chưa?"*
 thì gần như luôn nhận được *"ổn rồi"* — nên việc được giao phải là **đi tìm lỗi**.

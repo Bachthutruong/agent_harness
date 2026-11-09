@@ -23,7 +23,7 @@ echo
 echo ">>> AI tự báo: \"Đã tự kiểm tra, đạt 7/7 trường hợp.\"   (23.907 token)"
 echo
 echo ">>> Đem code đó qua cửa kiểm do NGƯỜI viết:"
-node "$R/harness/03-gate/gate.js" "$K/giohang-lan-A.js" || echo "    ^ mã thoát 1"
+node "$R/harness/03-gate/gate.js" --viec gio-hang --file "$K/giohang-lan-A.js" || echo "    ^ mã thoát 1"
 
 tieu_de "LẦN B — thêm đúng một file test.js do người viết trước."
 echo ">>> Code AI viết ra:"
@@ -32,7 +32,7 @@ echo
 echo ">>> AI tự báo: \"Đã chạy node test.js: 5/5 ĐẠT.\"   (5.159 token)"
 echo
 echo ">>> Đem code đó qua cửa kiểm do NGƯỜI viết:"
-node "$R/harness/03-gate/gate.js" "$K/giohang-lan-B.js" && echo "    ^ mã thoát 0"
+node "$R/harness/03-gate/gate.js" --viec gio-hang --file "$K/giohang-lan-B.js" && echo "    ^ mã thoát 0"
 
 gach
 echo " Khác biệt KHÔNG phải model thông minh hơn — cùng model, cùng một phút."
