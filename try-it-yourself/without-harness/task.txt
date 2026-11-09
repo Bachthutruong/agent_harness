@@ -1,4 +1,4 @@
-Viết hàm tinhTien(tien) trong file giohang.js.
+Viết hàm calcTotal(amount) trong file cart.js.
 
 Yêu cầu: đơn hàng từ 1.000.000đ trở lên thì được giảm 10%.
 Hàm trả về số tiền khách phải trả.

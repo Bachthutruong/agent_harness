@@ -16,27 +16,27 @@
 # File này không đổi.
 set -uo pipefail
 
-BUOC=(
+STEPS=(
   "node harness/03-gate/gate.js"
   "node harness/04-verify/verify.js"
 )
 
-R="$(cd "$(dirname "$0")/../.." && pwd)"
-cd "$R"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$ROOT"
 
-for b in "${BUOC[@]}"; do
+for step in "${STEPS[@]}"; do
   echo "=============================================================="
-  echo " \$ $b"
+  echo " \$ $step"
   echo "=============================================================="
-  if ! eval "$b"; then
+  if ! eval "$step"; then
     echo
-    echo ">>> DUNG tai buoc: $b"
-    echo ">>> Cua kiem KHONG cho qua. Agent phai lam lai, khong duoc bao xong."
+    echo ">>> STOPPED at step: $step"
+    echo ">>> Gate did NOT pass. Agent phải làm lại, không được báo xong."
     exit 1
   fi
   echo
 done
 
 echo "=============================================================="
-echo " CUA KIEM CHO QUA — tat ca ${#BUOC[@]} buoc deu thoat 0"
+echo " GATE PASSED — tất cả ${#STEPS[@]} bước đều thoát 0"
 echo "=============================================================="

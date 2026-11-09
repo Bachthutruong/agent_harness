@@ -18,13 +18,13 @@ cd agent_harness
 
 npm run demo        # phát lại lần chạy thật — KHÔNG cần AI, không cần mạng
 npm test            # gate: 16 trường hợp của 3 đầu việc, trả mã thoát 0/1
-npm run thu-lan-A   # đem code AI tự chấm "đạt 7/7" qua cửa kiểm → HỎNG, thoát 1
+npm run try-run-A   # đem code AI tự chấm "đạt 7/7" qua cửa kiểm → HỎNG, thoát 1
 npm run verify      # 9 lượt soát: 3 đầu việc × 3 kiểu lỗi
-npm run cua-kiem    # cửa kiểm của cả repo — thứ agent phải qua mới được báo xong
+npm run check-all    # cửa kiểm của cả repo — thứ agent phải qua mới được báo xong
 ```
 
 **Tự thử bằng AI của mình:** mở codex / Claude Code / Cursor ngay trong
-[`thu-tai-nha/`](thu-tai-nha/README.md) — hai thư mục khác nhau đúng một file.
+[`try-it-yourself/`](try-it-yourself/README.md) — hai thư mục khác nhau đúng một file.
 
 ## Chuyện đã xảy ra, ngày 08/11/2026
 
@@ -49,8 +49,8 @@ Nó thử thật — rồi tự viết ra rằng đáp số đúng là **900.000
 Nó đọc `test.js`, thấy dòng `TIỀN PHẢI LÀ SỐ NGUYÊN ĐỒNG`, rồi tự thêm `Math.round`.
 Và tiêu **ít hơn 4,6 lần** token, vì không phải tự nghĩ ra đề thi cho chính mình.
 
-Bản ghi đầy đủ hai lần chạy: [`demo/ket-qua-08-11-2026/`](demo/ket-qua-08-11-2026).
-Trang xem bằng mắt: [`trang/index.html`](trang/index.html).
+Bản ghi đầy đủ hai lần chạy: [`demo/recorded-2026-11-08/`](demo/recorded-2026-11-08).
+Trang xem bằng mắt: [`page/index.html`](page/index.html).
 
 ## Sáu thành phần
 
@@ -58,14 +58,14 @@ Mỗi thư mục là một thành phần, chạy được độc lập. Không c
 
 | | Thành phần | Trả lời câu | Ở đâu |
 | --- | --- | --- | --- |
-| 01 | **Context** | ai quyết phải thử trường hợp nào | [`harness/01-context/cong-viec/`](harness/01-context/cong-viec) |
-| 02 | **Tool** | ai quyết AI được chạy lệnh gì | [`harness/02-tool/chay-lenh.sh`](harness/02-tool/chay-lenh.sh) |
+| 01 | **Context** | ai quyết phải thử trường hợp nào | [`harness/01-context/tasks/`](harness/01-context/tasks) |
+| 02 | **Tool** | ai quyết AI được chạy lệnh gì | [`harness/02-tool/run-command.sh`](harness/02-tool/run-command.sh) |
 | 03 | **Gate** | ai chạy thử trước khi người xem | [`harness/03-gate/gate.js`](harness/03-gate/gate.js) |
 | 04 | **Verify** | ai soát lại để tìm lỗi | [`harness/04-verify/verify.js`](harness/04-verify/verify.js) |
 | 05 | **Rollback** | ai xoá bỏ được nếu đã sai | [`harness/05-rollback/snapshot.sh`](harness/05-rollback/snapshot.sh) |
 | 06 | **Budget** | ai bắt dừng khi quá tốn | [`harness/06-budget/budget.js`](harness/06-budget/budget.js) |
 
-`01-context/cong-viec/` là **source of truth**: gate và verify đều nạp từ đó, không thành phần
+`01-context/tasks/` là **source of truth**: gate và verify đều nạp từ đó, không thành phần
 nào tự chế danh sách riêng.
 
 Chi tiết từng thành phần: [`harness/README.md`](harness/README.md).
@@ -76,7 +76,7 @@ Một câu để phân biệt:
 
 > **Harness là thứ vẫn còn đó khi AI đã tắt.**
 
-Tắt AI đi rồi nhìn lại: câu dặn biến mất, `test.js` vẫn nằm đó, `cua-kiem.sh` vẫn chạy được,
+Tắt AI đi rồi nhìn lại: câu dặn biến mất, `test.js` vẫn nằm đó, `check-all.sh` vẫn chạy được,
 bản chụp vẫn trên đĩa. Hỏi cách khác cũng ra cùng kết quả: **nếu AI phớt lờ thì chuyện gì xảy
 ra?** Với lời dặn — không gì cả, nó báo xong và ta tin. Với harness — mã thoát khác 0, không ai
 phải phát hiện gì.
@@ -98,7 +98,7 @@ rẻ nhất và **yếu nhất** trong ba số, không phải vô cớ.
 Ba chỗ lời dặn không với tới, kể cả khi viết rất khéo:
 
 1. **Lời dặn sống một lần.** Hôm nay bạn dặn đúng. Tháng sau người khác sửa đúng hàm đó, trong
-   một cuộc chat khác, không có câu dặn ấy — lỗi quay lại. File trong `cong-viec/` thì lần sửa
+   một cuộc chat khác, không có câu dặn ấy — lỗi quay lại. File trong `tasks/` thì lần sửa
    nào cũng chặn.
 2. **Lời dặn không có phán quyết.** Dặn xong vẫn phải tin câu AI báo. Lần A trong `demo/` được
    dặn *"tự kiểm tra lại rồi báo xong"* — nó làm đúng y lời dặn, và báo đạt 7/7 cho một đáp số
@@ -122,20 +122,20 @@ Một câu dặn không thể truyền thứ nó không chứa.
 | | Viết mấy lần | Khi có đầu việc mới |
 | --- | --- | --- |
 | 02 Tool · 03 Gate · 04 Verify · 05 Rollback · 06 Budget | **một lần cho cả repo** | không mở ra nữa |
-| 01 Context — `cong-viec/<tên>.cases.js` | mỗi đầu việc một file | thêm đúng **một** file |
+| 01 Context — `tasks/<tên>.cases.js` | mỗi đầu việc một file | thêm đúng **một** file |
 
 Repo này đang có **ba** đầu việc — giỏ hàng, mã giảm giá, phí ship — hàm một tham số lẫn hai
 tham số, chạy chung một gate:
 
 ```
 $ npm test
---- Giỏ hàng — giảm 10% từ 1.000.000đ  [gio-hang]
---- Mã giảm giá — áp mã vào đơn  [ma-giam-gia]
---- Phí ship — tính theo cân nặng và khu vực  [phi-ship]
-TAT CA DAT — 16 truong hop, 3 dau viec
+--- Giỏ hàng — giảm 10% từ 1.000.000đ  [cart]
+--- Mã giảm giá — áp mã vào đơn  [discount-code]
+--- Phí ship — tính theo cân nặng và khu vực  [shipping-fee]
+ALL PASS — 16 cases, 3 tasks
 ```
 
-Thêm đầu việc thứ tư: tạo `harness/01-context/cong-viec/abc.cases.js`. Hết. `gate.js` tự quét
+Thêm đầu việc thứ tư: tạo `harness/01-context/tasks/abc.cases.js`. Hết. `gate.js` tự quét
 thư mục, `verify.js` cũng vậy.
 
 ## Tính năng nào cũng phải viết à?
@@ -156,11 +156,11 @@ thư mục, `verify.js` cũng vậy.
 | --- | --- | --- |
 | **0** | không gì cả | sai là nhìn thấy ngay |
 | **1** | 30 giây trong chat | mặc định cho phần lớn việc |
-| **2** | một file `cong-viec/<tên>.cases.js` | tiền, quyền, dữ liệu, hoặc việc còn sửa nhiều lần |
+| **2** | một file `tasks/<tên>.cases.js` | tiền, quyền, dữ liệu, hoặc việc còn sửa nhiều lần |
 
 **Số 1** là chỗ rẻ nhất mà ít người làm: bắt AI **liệt kê trường hợp nó định thử TRƯỚC khi
 viết code**, rồi người đọc lướt danh sách đó 30 giây. Không tạo file nào.
-Mẫu dán thẳng vào chat: [`harness/01-context/mau-giao-viec.md`](harness/01-context/mau-giao-viec.md).
+Mẫu dán thẳng vào chat: [`harness/01-context/task-template.md`](harness/01-context/task-template.md).
 
 Trong bản ghi ở `demo/`, nếu làm số 1 thì dòng `1.000.001 → 900.000,9` đã hiện ra trên màn
 hình chat trước khi có một dòng code nào. Nhìn một cái là thấy sai.
@@ -170,7 +170,7 @@ hình chat trước khi có một dòng code nào. Nhìn một cái là thấy s
 sau vẫn chặn.
 
 **Ở dự án thật, con số đó còn về gần 0.** Cửa kiểm là
-[`harness/03-gate/cua-kiem.sh`](harness/03-gate/cua-kiem.sh), và ở dự án thật nội dung nó thường
+[`harness/03-gate/check-all.sh`](harness/03-gate/check-all.sh), và ở dự án thật nội dung nó thường
 không có dòng nào mới — chỉ là lệnh bạn đã chạy hằng ngày, nối lại, dừng ở lệnh đầu tiên thoát
 khác 0:
 
@@ -186,23 +186,23 @@ framework. Nó làm cho test thành thứ **bắt buộc** với agent, thay vì
 
 ```
 harness/
-  01-context/cong-viec/   MỘT file cho MỖI đầu việc — chỗ duy nhất phải thêm
+  01-context/tasks/   MỘT file cho MỖI đầu việc — chỗ duy nhất phải thêm
   02-tool … 06-budget/    bộ máy, viết một lần cho cả repo
-  03-gate/cua-kiem.sh     cửa kiểm của cả repo: nối các bước, dừng ở bước hỏng
-vi-du/                    chỗ AI ghi code vào (3 file, khớp 3 đầu việc)
-thu-tai-nha/              hai thư mục để tự thử bằng AI của mình
+  03-gate/check-all.sh     cửa kiểm của cả repo: nối các bước, dừng ở bước hỏng
+examples/                    chỗ AI ghi code vào (3 file, khớp 3 đầu việc)
+try-it-yourself/              hai thư mục để tự thử bằng AI của mình
 demo/                     phát lại lần chạy thật + script chạy lại bằng codex
-trang/index.html          trang xem bằng mắt, mở bằng trình duyệt
+page/index.html          trang xem bằng mắt, mở bằng trình duyệt
 ```
 
 ## Lắp vào dự án thật
 
-1. Sửa `harness/03-gate/cua-kiem.sh` thành lệnh kiểm của dự án bạn (`typecheck`, `lint`,
+1. Sửa `harness/03-gate/check-all.sh` thành lệnh kiểm của dự án bạn (`typecheck`, `lint`,
    `test`). Đây là file **duy nhất** cần sửa một lần.
 2. Với mỗi đầu việc giao cho AI, viết trường hợp cần thử **trước khi giao** — bằng test
-   framework sẵn có, hoặc bằng một file trong `cong-viec/` nếu chưa có framework nào.
-3. Cho agent chạy lệnh qua `harness/02-tool/chay-lenh.sh`, đừng cho nó shell trần.
-4. Đặt `cua-kiem.sh` vào CI, chặn merge khi thoát khác 0.
+   framework sẵn có, hoặc bằng một file trong `tasks/` nếu chưa có framework nào.
+3. Cho agent chạy lệnh qua `harness/02-tool/run-command.sh`, đừng cho nó shell trần.
+4. Đặt `check-all.sh` vào CI, chặn merge khi thoát khác 0.
 5. Chụp dữ liệu bằng `05-rollback` trước mọi lần ghi.
 6. Bọc mọi lần gọi agent bằng `06-budget` để nó không chạy tới khi có người chặn tay.
 

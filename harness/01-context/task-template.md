@@ -18,7 +18,7 @@ Không tự sửa danh sách đã duyệt.
 
 ## Vì sao chỗ này ăn thua
 
-Đọc lại bản ghi trong [`demo/`](../../demo/ket-qua-08-11-2026): AI **có** thử số 1.000.001.
+Đọc lại bản ghi trong [`demo/`](../../demo/recorded-2026-11-08): AI **có** thử số 1.000.001.
 Nó không bỏ sót. Nó thử, rồi tự ghi đáp số đúng là **900.000,9 đồng**, rồi tự chấm đạt.
 
 Nếu lúc đó danh sách trường hợp được đưa ra cho người xem **trước khi viết code**, thì dòng
@@ -28,4 +28,4 @@ danh sách mất 30 giây; sửa hoá đơn tính sai thì không.
 ## Khi nào phải lên số 2 (viết file trường hợp)
 
 Khi đầu việc đó sẽ còn được sửa nữa. Danh sách duyệt trong chat chỉ sống trong một lần chat;
-file trong [`cong-viec/`](cong-viec) thì lần sửa sau vẫn chặn.
+file trong [`tasks/`](tasks) thì lần sửa sau vẫn chặn.

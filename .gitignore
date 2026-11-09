@@ -1,4 +1,4 @@
 node_modules/
-.anh-chup/
+.snapshots/
 .DS_Store
 *.log

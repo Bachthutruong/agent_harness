@@ -3,9 +3,9 @@
 Hai thư mục này chỉ khác nhau **đúng một file**. Mở AI chat (codex, Claude Code, Cursor…)
 **ngay trong từng thư mục**, dán cùng một đề bài, rồi so kết quả.
 
-| | `khong-co-harness/` | `co-harness/` |
+| | `without-harness/` | `with-harness/` |
 | --- | --- | --- |
-| Trong thư mục | `de-bai.txt` | `de-bai.txt` **+ `test.js`** |
+| Trong thư mục | `task.txt` | `task.txt` **+ `test.js`** |
 | Ai chốt phải thử gì | **AI tự chốt** | **người** chốt, trước khi giao |
 | Ai chấm điểm | **AI tự chấm** | `node test.js`, lấy mã thoát |
 
@@ -14,28 +14,28 @@ Hai thư mục này chỉ khác nhau **đúng một file**. Mở AI chat (codex,
 **Bước 1 — lần không có harness.**
 
 ```bash
-cd thu-tai-nha/khong-co-harness
+cd try-it-yourself/without-harness
 codex            # hoặc claude, cursor-agent… mở ngay trong thư mục này
 ```
 
-Dán nguyên văn nội dung `de-bai.txt` vào chat. Để nó làm tới khi nó báo xong.
+Dán nguyên văn nội dung `task.txt` vào chat. Để nó làm tới khi nó báo xong.
 **Đọc kỹ câu nó báo** — nó sẽ nói đã tự kiểm tra và đạt hết.
 
 Rồi đem code nó vừa viết qua cửa kiểm của người:
 
 ```bash
 cd ../..
-node harness/03-gate/gate.js thu-tai-nha/khong-co-harness/giohang.js
+node harness/03-gate/gate.js try-it-yourself/without-harness/giohang.js
 ```
 
 **Bước 2 — lần có harness.**
 
 ```bash
-cd thu-tai-nha/co-harness
+cd try-it-yourself/with-harness
 codex
 ```
 
-Dán nội dung `de-bai.txt` của thư mục này. Lần này nó phải chạy `node test.js` mới được
+Dán nội dung `task.txt` của thư mục này. Lần này nó phải chạy `node test.js` mới được
 báo xong.
 
 ## Chú ý khi so
