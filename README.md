@@ -70,6 +70,51 @@ nào tự chế danh sách riêng.
 
 Chi tiết từng thành phần: [`harness/README.md`](harness/README.md).
 
+## Khác gì hướng dẫn viết prompt?
+
+Một câu để phân biệt:
+
+> **Harness là thứ vẫn còn đó khi AI đã tắt.**
+
+Tắt AI đi rồi nhìn lại: câu dặn biến mất, `test.js` vẫn nằm đó, `cua-kiem.sh` vẫn chạy được,
+bản chụp vẫn trên đĩa. Hỏi cách khác cũng ra cùng kết quả: **nếu AI phớt lờ thì chuyện gì xảy
+ra?** Với lời dặn — không gì cả, nó báo xong và ta tin. Với harness — mã thoát khác 0, không ai
+phải phát hiện gì.
+
+Thử viết từng thành phần bằng prompt:
+
+| Thành phần | Viết bằng lời dặn được không |
+| --- | --- |
+| 01 Context | **Một phần** — dặn được, nhưng chỉ sống trong đúng lần chat đó |
+| 02 Tool | Không. "Đừng xoá gì nhé" không ngăn được một lệnh `rm` |
+| 03 Gate | Không. Lời dặn không sinh ra mã thoát |
+| 04 Verify | Không. Một lượt soát chạy sau khi AI đã xong, không phải một câu nói với AI |
+| 05 Rollback | Không. Bản chụp là file trên đĩa |
+| 06 Budget | Không. Giới hạn là một tiến trình bị cắt |
+
+Một trên sáu. Và đúng là **số 1 ở mục trên chính là cách giao việc** — repo này xếp nó là số
+rẻ nhất và **yếu nhất** trong ba số, không phải vô cớ.
+
+Ba chỗ lời dặn không với tới, kể cả khi viết rất khéo:
+
+1. **Lời dặn sống một lần.** Hôm nay bạn dặn đúng. Tháng sau người khác sửa đúng hàm đó, trong
+   một cuộc chat khác, không có câu dặn ấy — lỗi quay lại. File trong `cong-viec/` thì lần sửa
+   nào cũng chặn.
+2. **Lời dặn không có phán quyết.** Dặn xong vẫn phải tin câu AI báo. Lần A trong `demo/` được
+   dặn *"tự kiểm tra lại rồi báo xong"* — nó làm đúng y lời dặn, và báo đạt 7/7 cho một đáp số
+   sai. Cửa kiểm thì do một chương trình chạy **sau khi AI đã xong**.
+3. **Lời dặn chỉ chạm tới văn bản.** Chặn lệnh, chụp dữ liệu, cắt khi quá giờ — không câu nào
+   làm được.
+
+### "Nhưng lần B anh cũng sửa đề bài mà"
+
+Đúng, đề bài lần B có thêm câu *"BẮT BUỘC chạy `node test.js`"*. Nhưng câu đó **không mang theo
+thông tin nào**: bỏ `test.js` đi, câu đó thành vô nghĩa.
+
+Bằng chứng nằm trong chính code AI viết ra: `Math.round`. Hai chữ *"làm tròn"* và *"số nguyên"*
+**không xuất hiện ở bất kỳ đâu trong đề bài lần B** — chúng chỉ có trong `test.js` do người viết.
+Một câu dặn không thể truyền thứ nó không chứa.
+
 ## Nhiều đầu việc thì sao — mỗi việc một harness à?
 
 **Không.** Bộ máy viết **một lần**. Mỗi đầu việc chỉ thêm **một file dữ liệu**.
