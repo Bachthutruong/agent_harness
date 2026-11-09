@@ -23,8 +23,15 @@ npm run verify      # 9 lượt soát: 3 đầu việc × 3 kiểu lỗi
 npm run check-all    # cửa kiểm của cả repo — thứ agent phải qua mới được báo xong
 ```
 
-**Tự thử bằng AI của mình:** mở codex / Claude Code / Cursor ngay trong
-[`try-it-yourself/`](try-it-yourself/README.md) — hai thư mục khác nhau đúng một file.
+**Tự thử bằng AI của mình** — hai lệnh này chép đề bài ra thư mục sạch **ngoài repo** rồi in
+sẵn từng bước (ra ngoài repo vì mở AI ở đây thì nó đọc `README.md` và biết trước đáp án):
+
+```bash
+npm run try:without   # /tmp/harness-try-without — chỉ có đề bài
+npm run try:with      # /tmp/harness-try-with    — có thêm test.js do người viết
+```
+
+Chi tiết và chỗ cần nhìn: [`try-it-yourself/README.md`](try-it-yourself/README.md).
 
 ## Chuyện đã xảy ra, ngày 08/11/2026
 

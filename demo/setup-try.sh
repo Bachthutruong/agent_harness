@@ -17,7 +17,12 @@ esac
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/try-it-yourself/$KIND-harness"
-DEST="$(mktemp -d "${TMPDIR:-/tmp}/harness-try-$KIND-XXXXXX")"
+
+# Đường dẫn cố định và ngắn, không phải mktemp ngẫu nhiên: để câu lệnh in ra
+# copy dán được, và lần nào chạy cũng ra đúng một chỗ dễ nhớ.
+DEST="/tmp/harness-try-$KIND"
+rm -rf "$DEST"          # làm mới mỗi lần, không để sót code của lần thử trước
+mkdir -p "$DEST"
 cp "$SRC"/* "$DEST/"
 
 echo "=============================================================="
@@ -25,7 +30,7 @@ echo " Thư mục thử: $DEST"
 echo " Trong đó có: $(cd "$DEST" && ls | tr '\n' ' ')"
 echo "=============================================================="
 echo
-echo "BƯỚC 1 — mở AI ngay trong thư mục đó:"
+echo "BƯỚC 1 — copy đúng dòng này, dán vào terminal:"
 echo
 echo "    cd $DEST && codex"
 echo
