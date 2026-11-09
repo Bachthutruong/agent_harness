@@ -12,6 +12,8 @@
     "budget": "node harness/06-budget/budget.js --seconds 30 --tries 2 -- npm test",
     "try-run-A": "node harness/03-gate/gate.js --task cart --file demo/recorded-2026-11-08/cart-run-A.js --fn tinhTien",
     "try-run-B": "node harness/03-gate/gate.js --task cart --file demo/recorded-2026-11-08/cart-run-B.js --fn tinhTien",
+    "try:without": "bash demo/setup-try.sh without",
+    "try:with": "bash demo/setup-try.sh with",
     "demo": "bash demo/replay.sh",
     "demo:live": "bash demo/run-live.sh"
   }

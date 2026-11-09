@@ -1,7 +1,7 @@
 # Tự thử bằng AI của mình
 
-Hai thư mục này chỉ khác nhau **đúng một file**. Mở AI chat (codex, Claude Code, Cursor…)
-**ngay trong từng thư mục**, dán cùng một đề bài, rồi so kết quả.
+Hai thư mục này khác nhau **đúng một file**. Chạy lần lượt cả hai, so câu AI tự báo với kết
+quả cửa kiểm.
 
 | | `without-harness/` | `with-harness/` |
 | --- | --- | --- |
@@ -9,40 +9,39 @@ Hai thư mục này chỉ khác nhau **đúng một file**. Mở AI chat (codex,
 | Ai chốt phải thử gì | **AI tự chốt** | **người** chốt, trước khi giao |
 | Ai chấm điểm | **AI tự chấm** | `node test.js`, lấy mã thoát |
 
-## Làm thế này
+## Đừng mở AI ngay trong repo
 
-**Bước 1 — lần không có harness.**
+Mở AI ở đây thì nó đọc được `README.md` của repo, biết trước cái bẫy làm tròn, và thí nghiệm
+mất sạch ý nghĩa. Bản ghi ngày 08/11 cũng chạy trong thư mục tạm chỉ có đúng đề bài.
 
-```bash
-cd try-it-yourself/without-harness
-codex            # hoặc claude, cursor-agent… mở ngay trong thư mục này
-```
-
-Dán nguyên văn nội dung `task.txt` vào chat. Để nó làm tới khi nó báo xong.
-**Đọc kỹ câu nó báo** — nó sẽ nói đã tự kiểm tra và đạt hết.
-
-Rồi đem code nó vừa viết qua cửa kiểm của người:
+Dùng hai lệnh này — chúng chép đề bài ra thư mục sạch ngoài repo rồi in sẵn từng bước:
 
 ```bash
-cd ../..
-node harness/03-gate/gate.js try-it-yourself/without-harness/giohang.js
+npm run try:without     # lần KHÔNG có cửa kiểm
+npm run try:with        # lần CÓ test.js do người viết
 ```
 
-**Bước 2 — lần có harness.**
+## Lần 1 — không có cửa kiểm
 
-```bash
-cd try-it-yourself/with-harness
-codex
-```
+Làm theo ba bước lệnh in ra. Khi AI báo xong, **nhìn ba chỗ** trước khi chạy cửa kiểm:
 
-Dán nội dung `task.txt` của thư mục này. Lần này nó phải chạy `node test.js` mới được
-báo xong.
+1. **Câu nó báo.** Gần như chắc chắn có dạng *"đã tự kiểm tra, đạt N/N trường hợp"*.
+2. **Hỏi lại nó:** `bạn đã thử những số nào? liệt kê vào → ra` — đây mới là chỗ bài học nằm.
+3. **Soi danh sách đó** xem có số nào trên 1.000.000 mà không chia hết cho 10 không
+   (1.000.001, 1.234.567…). Nếu có, xem nó ghi đáp số bao nhiêu.
 
-## Chú ý khi so
+Rồi mới chấm bằng cửa kiểm của người. Mã thoát `1` nghĩa là code đó không qua.
 
-- Nếu AI ở bước 1 **không export** `module.exports = { tinhTien }` thì gate không nạp
-  được file (thoát 2). Thêm dòng đó vào rồi chạy lại — đừng sửa gì khác.
-- **Kết quả có thể khác bản ghi trong `demo/`.** Model không cố định. Bài học không phải
-  "AI hay sai", mà là **không ai biết nó đúng hay sai khi chính nó chọn đề và chính nó
-  chấm**. Nếu bước 1 tình cờ đúng hết: hỏi nó đã thử những số nào, rồi hỏi ai duyệt
-  danh sách đó.
+## Lần 2 — có cửa kiểm
+
+Đề bài gần như y hệt, chỉ thêm câu bắt buộc chạy `node test.js`. Nhìn code nó viết ra: nếu có
+`Math.round` thì để ý — **hai chữ "làm tròn" và "số nguyên" không có trong đề bài**. Nó lấy từ
+`test.js`.
+
+## Nếu kết quả khác bản ghi trong `demo/`
+
+Bình thường, model không cố định. Bài học không phải "AI hay sai", mà là **không ai biết nó
+đúng hay sai khi chính nó chọn đề và chính nó chấm**.
+
+Lần 1 tình cờ đúng hết thì vẫn còn chỗ để chỉ: danh sách trường hợp đó **do AI chọn, không ai
+duyệt** — và lần sau nó có thể chọn khác.
