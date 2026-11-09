@@ -93,6 +93,37 @@ TAT CA DAT — 16 truong hop, 3 dau viec
 Thêm đầu việc thứ tư: tạo `harness/01-context/cong-viec/abc.cases.js`. Hết. `gate.js` tự quét
 thư mục, `verify.js` cũng vậy.
 
+## Tính năng nào cũng phải viết à?
+
+**Không.** Viết trường hợp là có giá, nên chỉ trả giá ở chỗ đáng. Câu để quyết định:
+
+> **Nếu chỗ này sai, ai là người phát hiện?**
+
+| Nếu sai thì | Ví dụ | Làm gì |
+| --- | --- | --- |
+| **nhìn phát thấy ngay** | đổi chữ, màu, khoảng cách, dựng màn hình mới | không viết gì — mở lên là biết |
+| **lát nữa có người thấy** | lọc danh sách, sắp xếp, phân trang | số 1 bên dưới |
+| **không ai thấy, tới hoá đơn mới lộ** | tính tiền, thuế, quyền, ghi dữ liệu, trạng thái đơn | số 2 — viết file trường hợp |
+
+### Ba số, không phải một
+
+| | Tốn gì | Dùng khi |
+| --- | --- | --- |
+| **0** | không gì cả | sai là nhìn thấy ngay |
+| **1** | 30 giây trong chat | mặc định cho phần lớn việc |
+| **2** | một file `cong-viec/<tên>.cases.js` | tiền, quyền, dữ liệu, hoặc việc còn sửa nhiều lần |
+
+**Số 1** là chỗ rẻ nhất mà ít người làm: bắt AI **liệt kê trường hợp nó định thử TRƯỚC khi
+viết code**, rồi người đọc lướt danh sách đó 30 giây. Không tạo file nào.
+Mẫu dán thẳng vào chat: [`harness/01-context/mau-giao-viec.md`](harness/01-context/mau-giao-viec.md).
+
+Trong bản ghi ở `demo/`, nếu làm số 1 thì dòng `1.000.001 → 900.000,9` đã hiện ra trên màn
+hình chat trước khi có một dòng code nào. Nhìn một cái là thấy sai.
+
+**Số 2** chỉ dành cho chỗ sai mà không ai biết. Lý do lên số 2 không phải "việc này khó", mà là
+**việc này còn được sửa nữa**: danh sách duyệt trong chat chỉ sống một lần chat, file thì lần
+sau vẫn chặn.
+
 **Ở dự án thật, con số đó còn về gần 0.** Cửa kiểm là
 [`harness/03-gate/cua-kiem.sh`](harness/03-gate/cua-kiem.sh), và ở dự án thật nội dung nó thường
 không có dòng nào mới — chỉ là lệnh bạn đã chạy hằng ngày, nối lại, dừng ở lệnh đầu tiên thoát
