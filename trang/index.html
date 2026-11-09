@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Một file, hai kết quả</title>
+<meta name="description" content="Bản ghi lần chạy thật: cùng một đề bài giao hai lần cho cùng một AI, khác nhau đúng một file do người viết trước.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Bố cục: một cột đọc dọc, max 1080px; chỉ khối so sánh A/B và khối terminal được tràn rộng.
+   Chữ thường dùng IBM Plex Sans; mọi con số, mã nguồn và nhãn dùng JetBrains Mono — trang này
+   nói về code nên mono là mặt chữ thứ hai làm việc thật, không phải để trang trí. */
+:root{
+  color-scheme: light;
+  --paper:#f4f2ec;
+  --surface:#fbfaf6;
+  --ink:#1a1e24;
+  --ink-soft:#636b74;
+  --line:#ddd9cf;
+  --accent:#186459;
+  --accent-wash:#e7f1ef;
+  --warn:#9a5516;
+  --warn-wash:#f8ece0;
+  --slate:#1d232b;
+  --slate-ink:#eceae4;
+  --slate-soft:#99a2ac;
+  --sans:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#14181d;
+    --surface:#1b2026;
+    --ink:#eceae4;
+    --ink-soft:#9aa3ad;
+    --line:#2c333b;
+    --accent:#43b3a3;
+    --accent-wash:#16302e;
+    --warn:#e3a868;
+    --warn-wash:#33261a;
+    --slate:#0d1116;
+    --slate-ink:#eceae4;
+    --slate-soft:#8d96a0;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#14181d;
+  --surface:#1b2026;
+  --ink:#eceae4;
+  --ink-soft:#9aa3ad;
+  --line:#2c333b;
+  --accent:#43b3a3;
+  --accent-wash:#16302e;
+  --warn:#e3a868;
+  --warn-wash:#33261a;
+  --slate:#0d1116;
+  --slate-ink:#eceae4;
+  --slate-soft:#8d96a0;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.12;font-weight:600}
+h1{font-size:clamp(38px,6.4vw,68px);letter-spacing:-0.02em}
+h2{font-size:clamp(26px,3.4vw,38px);letter-spacing:-0.01em}
+h3{font-size:19px;line-height:1.25}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:2.4px;
+  text-transform:uppercase;color:var(--accent);
+}
+
+/* ---- header ---- */
+header{padding:clamp(48px,7vw,88px) 0 clamp(32px,5vw,56px)}
+.lead{font-size:clamp(19px,2.3vw,24px);line-height:1.5;color:var(--ink);max-width:62ch;margin-top:24px}
+.formula{
+  display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-top:28px;
+  font-family:var(--mono);font-size:clamp(15px,2vw,19px);font-weight:700;
+  background:var(--accent-wash);color:var(--accent);
+  border-radius:999px;padding:10px 22px;
+}
+.runmeta{
+  display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:28px;
+  font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);
+}
+.runmeta span{border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--surface)}
+
+/* ---- sections ---- */
+section{padding-block:clamp(40px,6vw,72px);border-top:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:14px;margin-bottom:32px}
+.sec-head p{color:var(--ink-soft);max-width:68ch;font-size:17.5px}
+
+/* ---- cards & grids ---- */
+.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:24px;display:flex;flex-direction:column;gap:10px;
+}
+.card .step{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--accent);line-height:1}
+.card p{color:var(--ink-soft);font-size:16px}
+
+.ab{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.lane{border-radius:16px;border:1px solid var(--line);background:var(--surface);overflow:hidden;display:flex;flex-direction:column}
+.lane.b{border-color:var(--accent);border-width:2px}
+.lane-top{padding:20px 24px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line)}
+.lane.a .lane-top{background:var(--warn-wash)}
+.lane.b .lane-top{background:var(--accent-wash)}
+.lane-tag{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:2px}
+.lane.a .lane-tag{color:var(--warn)}
+.lane.b .lane-tag{color:var(--accent)}
+.lane-body{padding:24px;display:flex;flex-direction:column;gap:20px;flex:1}
+.field{display:flex;flex-direction:column;gap:7px}
+.field-label{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-soft)}
+.said{font-size:17px;line-height:1.45;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:4px 10px;background:var(--paper)}
+.chip.ours{border-color:var(--accent);color:var(--accent);font-weight:700}
+
+/* ---- code & terminal ---- */
+pre{
+  margin:0;font-family:var(--mono);font-size:14px;line-height:1.65;
+  background:var(--slate);color:var(--slate-ink);
+  border-radius:12px;padding:18px 20px;overflow-x:auto;
+}
+pre.plain{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+code{font-family:var(--mono);font-size:0.94em}
+.term{background:var(--slate);border-radius:12px;overflow:hidden}
+.term-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 16px;border-bottom:1px solid #2c333b;
+  font-family:var(--mono);font-size:12px;color:var(--slate-soft);
+}
+.term-body{padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.8;color:var(--slate-ink);white-space:pre;min-height:170px}
+.term-body .dat{color:#43b3a3}
+.term-body .hong{color:#ff8f6b;font-weight:700}
+.term-body .dim{color:var(--slate-soft)}
+.exit{font-family:var(--mono);font-size:12.5px;font-weight:700;border-radius:6px;padding:4px 10px}
+.exit.ok{background:#16302e;color:#43b3a3}
+.exit.bad{background:#3a1d14;color:#ff8f6b}
+
+/* ---- the money moment ---- */
+.hit{
+  display:grid;gap:24px;align-items:center;
+  grid-template-columns:minmax(260px,0.9fr) minmax(280px,1.1fr);
+  background:var(--warn-wash);border:2px solid var(--warn);border-radius:16px;
+  padding:clamp(24px,3.6vw,40px);
+}
+.hit .big{font-family:var(--mono);font-size:clamp(40px,7.4vw,76px);font-weight:700;line-height:1;color:var(--warn);font-variant-numeric:tabular-nums}
+.hit .cap{font-size:16px;color:var(--ink);margin-top:12px}
+.hit .say{font-size:clamp(18px,2.2vw,22px);line-height:1.45}
+@media (max-width:720px){.hit{grid-template-columns:1fr}}
+
+/* ---- case list ---- */
+.caselist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.caserow{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;padding:12px 18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:14.5px;font-variant-numeric:tabular-nums}
+.caserow:first-child{border-top:0}
+.caserow .io{min-width:230px}
+.caserow .note{font-family:var(--sans);font-size:14.5px;color:var(--ink-soft)}
+.caserow.bad{background:var(--warn-wash);color:var(--warn);font-weight:700}
+.caserow.bad .note{color:var(--warn);font-weight:600}
+.caserow.key{background:var(--accent-wash);color:var(--accent);font-weight:700}
+.caserow.key .note{color:var(--accent);font-weight:600}
+
+/* ---- try it ---- */
+.try{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:22px}
+.tryrow{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+label{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:8px}
+input[type="number"]{
+  font-family:var(--mono);font-size:22px;font-variant-numeric:tabular-nums;
+  width:min(260px,100%);padding:12px 14px;border-radius:10px;
+  border:1px solid var(--line);background:var(--paper);color:var(--ink);
+}
+button{
+  font-family:var(--sans);font-size:15px;font-weight:600;cursor:pointer;
+  border-radius:10px;padding:11px 18px;border:1px solid var(--line);
+  background:var(--paper);color:var(--ink);
+}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button.go{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+button.go:hover{color:var(--paper);opacity:0.9}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.presets button{font-family:var(--mono);font-size:13.5px;padding:8px 13px}
+.out{display:grid;gap:12px}
+.outrow{
+  display:grid;gap:4px 16px;grid-template-columns:minmax(180px,auto) 1fr;
+  align-items:baseline;padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:var(--paper);
+}
+.outrow .who{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-soft)}
+.outrow .val{font-family:var(--mono);font-size:clamp(22px,3vw,30px);font-weight:700;font-variant-numeric:tabular-nums;grid-column:1/-1}
+.outrow .why{font-size:14.5px;color:var(--ink-soft);grid-column:1/-1}
+.outrow.bad{border-color:var(--warn);border-width:2px;background:var(--warn-wash)}
+.outrow.bad .val,.outrow.bad .who{color:var(--warn)}
+.outrow.ok{border-color:var(--accent);background:var(--accent-wash)}
+.outrow.ok .val,.outrow.ok .who{color:var(--accent)}
+.verdict{font-size:17px;line-height:1.5;padding:16px 18px;border-radius:12px;background:var(--paper);border:1px dashed var(--line)}
+
+/* ---- why / points ---- */
+.points{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.point{display:grid;gap:6px 22px;grid-template-columns:72px 1fr;padding:22px 0;border-bottom:1px solid var(--line)}
+.point .n{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--accent);line-height:1}
+.point p{color:var(--ink-soft);font-size:16.5px}
+@media (max-width:560px){.point{grid-template-columns:1fr}}
+
+.band{background:var(--slate);color:var(--slate-ink);border-radius:16px;padding:clamp(24px,3.4vw,38px)}
+.band .q{font-size:clamp(20px,2.8vw,28px);line-height:1.35;font-weight:500}
+.band .q b{color:#43b3a3;font-weight:700}
+.band .sub{margin-top:16px;color:var(--slate-soft);font-size:16px;max-width:66ch}
+
+.note{border-left:3px solid var(--warn);background:var(--warn-wash);padding:18px 22px;border-radius:0 12px 12px 0;font-size:16.5px;line-height:1.55}
+.note b{color:var(--warn)}
+
+.filelist{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:20px}
+.filelist div{font-family:var(--mono);font-size:13.5px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface)}
+.filelist b{color:var(--accent)}
+
+details{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-top:14px}
+summary{cursor:pointer;padding:16px 20px;font-weight:600;font-size:16px}
+summary::marker{color:var(--accent)}
+details pre{border-radius:0 0 12px 12px;font-size:12.5px;line-height:1.6}
+
+footer{padding:48px 0 72px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:15px;display:flex;flex-direction:column;gap:14px}
+footer .by{font-family:var(--mono);font-size:13px;letter-spacing:1px;color:var(--ink)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <p class="eyebrow">Seminar · AI Coding Harness · 08/11/2026</p>
+  <h1>Một file, hai kết quả</h1>
+  <p class="lead">Cùng một đề bài. Cùng một model, cùng một phút. Giao hai lần. Khác nhau đúng <b>một file</b> do người viết trước khi giao việc. Đây là bản ghi của lần chạy thật, không dàn dựng.</p>
+  <p class="formula">Agent = Model + Harness</p>
+  <div class="runmeta">
+    <span>model: gpt-6.1-sol</span>
+    <span>mức suy luận: xhigh</span>
+    <span>codex v0.166.0</span>
+    <span>chạy 08/11/2026</span>
+    <span>Vu Duy Bach</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Demo này là gì</h2>
+    <p>Ba bước. Không có mẹo, không có câu dẫn dắt nào bị giấu trong đề bài.</p>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <p class="step">01</p>
+      <h3>Một đề bài bình thường</h3>
+      <p>“Viết hàm tính tiền. Đơn từ 1.000.000đ trở lên được giảm 10%. Tự kiểm tra lại rồi báo xong.” Đúng kiểu ta vẫn giao việc cho AI hằng ngày.</p>
+    </div>
+    <div class="card">
+      <p class="step">02</p>
+      <h3>Giao hai lần cho cùng một AI</h3>
+      <p>Lần A: thư mục trống, AI tự nghĩ ra trường hợp để thử và tự chấm điểm mình. Lần B: y hệt, trừ một thứ.</p>
+    </div>
+    <div class="card">
+      <p class="step">03</p>
+      <h3>Lần B có thêm một file</h3>
+      <p><code>test.js</code> — danh sách trường hợp phải thử, do <b>người</b> chốt, <b>trước</b> khi giao việc. Chỉ có thế. Không đổi model, không thêm lời dặn nào về cách viết code.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Đề bài, nguyên văn</h2>
+    <p>Phần chữ xám là giống nhau cả hai lần. Phần viền xanh chỉ có ở lần B.</p>
+  </div>
+  <pre class="plain">Viết hàm tinhTien(tien) trong file giohang.js.
+
+Yêu cầu: đơn hàng từ 1.000.000đ trở lên thì được giảm 10%.
+Hàm trả về số tiền khách phải trả.
+
+Tự kiểm tra lại rồi báo xong.</pre>
+  <div style="margin-top:14px;border:2px solid var(--accent);border-radius:12px;background:var(--accent-wash);padding:18px 20px">
+    <p class="field-label" style="color:var(--accent)">Hai dòng chỉ lần B có</p>
+    <pre class="plain" style="margin-top:10px;background:var(--surface)">BẮT BUỘC: chạy `node test.js`. Chỉ được báo xong khi tất cả trường hợp ĐẠT.
+Không được sửa file test.js.</pre>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Hai lần chạy, cạnh nhau</h2>
+    <p>Cả hai lần AI đều viết code <b>đúng phần khó</b>: nhận ra ngưỡng, so sánh “từ ... trở lên”, giảm 10%. Khác nhau một chữ.</p>
+  </div>
+  <div class="ab">
+
+    <div class="lane a">
+      <div class="lane-top">
+        <p class="lane-tag">LẦN A</p>
+        <h3>AI tự ra đề, tự chấm</h3>
+      </div>
+      <div class="lane-body">
+        <div class="field">
+          <p class="field-label">Trong thư mục có gì</p>
+          <div class="chips"><span class="chip">de-bai.txt</span></div>
+        </div>
+        <div class="field">
+          <p class="field-label">Code AI viết ra</p>
+          <pre>function tinhTien(tien) {
+  return tien &gt;= 1_000_000
+    ? tien * 0.9
+    : tien;
+}</pre>
+        </div>
+        <div class="field">
+          <p class="field-label">AI tự báo</p>
+          <p class="said">“Đã tự kiểm tra, <b>đạt 7/7 trường hợp</b>, gồm dưới, bằng và trên mốc 1.000.000đ.”</p>
+        </div>
+        <div class="field">
+          <p class="field-label">Qua cửa kiểm của người</p>
+          <div class="chips"><span class="chip" style="border-color:var(--warn);color:var(--warn);font-weight:700">HỎNG · exit 1</span><span class="chip">23.907 token</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lane b">
+      <div class="lane-top">
+        <p class="lane-tag">LẦN B</p>
+        <h3>Người chốt đề trước</h3>
+      </div>
+      <div class="lane-body">
+        <div class="field">
+          <p class="field-label">Trong thư mục có gì</p>
+          <div class="chips"><span class="chip">de-bai.txt</span><span class="chip ours">test.js · người viết</span></div>
+        </div>
+        <div class="field">
+          <p class="field-label">Code AI viết ra</p>
+          <pre>function tinhTien(tien) {
+  return tien &gt;= 1000000
+    ? <b style="color:#43b3a3">Math.round</b>(tien * 0.9)
+    : tien;
+}</pre>
+        </div>
+        <div class="field">
+          <p class="field-label">AI tự báo</p>
+          <p class="said">“Đã chạy <code>node test.js</code>: <b>5/5 trường hợp ĐẠT</b>. Không sửa test.js.”</p>
+        </div>
+        <div class="field">
+          <p class="field-label">Qua cửa kiểm của người</p>
+          <div class="chips"><span class="chip" style="border-color:var(--accent);color:var(--accent);font-weight:700">TẤT CẢ ĐẠT · exit 0</span><span class="chip">5.159 token</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="note" style="margin-top:22px">
+    <b>Không ai dạy nó làm tròn.</b> Trong đề bài lần B không có chữ “làm tròn”, không có chữ “số nguyên”. Nó đọc file người viết, thấy dòng <span class="num">TIỀN PHẢI LÀ SỐ NGUYÊN ĐỒNG</span>, rồi tự thêm <code>Math.round</code>. Và nó tiêu <b>ít hơn 4,6 lần</b> số token, vì không phải tự ngồi nghĩ ra đề thi cho chính mình.
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Chỗ hỏng không phải nó bỏ sót</h2>
+    <p>Đây là bảy trường hợp lần A <b>tự chọn</b> để tự kiểm tra. Nó viết ra, nó chạy, nó báo đạt hết.</p>
+  </div>
+  <div class="caselist">
+    <div class="caserow"><span class="io">0 → 0</span><span class="note">đơn rỗng</span></div>
+    <div class="caserow"><span class="io">500.000 → 500.000</span><span class="note">dưới ngưỡng</span></div>
+    <div class="caserow"><span class="io">999.999 → 999.999</span><span class="note">sát dưới ngưỡng</span></div>
+    <div class="caserow"><span class="io">1.000.000 → 900.000</span><span class="note">đúng ngưỡng</span></div>
+    <div class="caserow bad"><span class="io">1.000.001 → 900.000,9</span><span class="note">AI tự ghi đáp số này, rồi tự chấm ĐẠT</span></div>
+    <div class="caserow"><span class="io">1.500.000 → 1.350.000</span><span class="note">trên ngưỡng</span></div>
+    <div class="caserow"><span class="io">2.000.000 → 1.800.000</span><span class="note">trên ngưỡng</span></div>
+  </div>
+
+  <div class="hit" style="margin-top:26px">
+    <div>
+      <p class="big">900.000,9 đ</p>
+      <p class="cap">Số tiền lần A khẳng định khách phải trả cho đơn 1.000.001đ. Đồng Việt Nam không có số lẻ sau dấu phẩy.</p>
+    </div>
+    <div>
+      <p class="say">Nó <b>có</b> thử số 1.000.001. Nó không bỏ sót trường hợp nào. Nó thử, rồi <b>tự viết ra rằng đáp số đúng là 900.000,9 đồng</b> — và tự chấm mình đạt.</p>
+      <p class="cap">Không ai nói dối ở đây. Nó báo đúng những gì nó đã thử. Vấn đề là chính nó ra đề và chính nó chấm.</p>
+    </div>
+  </div>
+
+  <p class="verdict" style="margin-top:20px">Lỗi này không hiếm: <code>tiền × 0,9</code> ra số nguyên chỉ khi số tiền chia hết cho 10. Trang này vừa tự đếm 1.000 đơn hàng liên tiếp từ 1.000.000đ: <b><span id="dem" class="num">—</span> đơn ra số tiền có lẻ hào.</b></p>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Thử tại chỗ</h2>
+    <p>Đổi số tiền, xem hai bản code trả về gì. Cùng một đơn hàng, hai câu trả lời.</p>
+  </div>
+  <div class="try">
+    <div class="tryrow">
+      <div>
+        <label for="tien">Số tiền đơn hàng (đồng)</label>
+        <input id="tien" type="number" min="0" step="1" value="1000001" inputmode="numeric">
+      </div>
+      <div class="presets" role="group" aria-label="Số tiền mẫu">
+        <button type="button" data-v="999999">999.999</button>
+        <button type="button" data-v="1000000">1.000.000</button>
+        <button type="button" data-v="1000001">1.000.001</button>
+        <button type="button" data-v="1234567">1.234.567</button>
+        <button type="button" data-v="1200000">1.200.000</button>
+      </div>
+    </div>
+    <div class="out">
+      <div class="outrow" id="row-a">
+        <span class="who">Lần A · tien * 0.9</span>
+        <span class="val" id="val-a">—</span>
+        <span class="why" id="why-a"></span>
+      </div>
+      <div class="outrow" id="row-b">
+        <span class="who">Lần B · Math.round(tien * 0.9)</span>
+        <span class="val" id="val-b">—</span>
+        <span class="why" id="why-b"></span>
+      </div>
+    </div>
+    <p class="verdict" id="verdict"></p>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Cửa kiểm của người</h2>
+    <p>Toàn bộ harness trong demo này là một file. Dòng quan trọng nhất là dòng thứ tư: một quyết định nghiệp vụ mà không model nào đoán hộ được.</p>
+  </div>
+  <div class="caselist">
+    <div class="caserow"><span class="io">0 → 0</span><span class="note">đơn rỗng</span></div>
+    <div class="caserow"><span class="io">999.999 → 999.999</span><span class="note">dưới ngưỡng, không giảm</span></div>
+    <div class="caserow"><span class="io">1.000.000 → 900.000</span><span class="note">đúng ngưỡng, phải được giảm</span></div>
+    <div class="caserow key"><span class="io">1.000.001 → 900.001</span><span class="note">TIỀN PHẢI LÀ SỐ NGUYÊN ĐỒNG</span></div>
+    <div class="caserow"><span class="io">1.200.000 → 1.080.000</span><span class="note">trên ngưỡng, có giảm</span></div>
+  </div>
+
+  <div class="ab" style="margin-top:24px">
+    <div class="term">
+      <div class="term-bar"><span>đem code LẦN A qua cửa kiểm</span><span class="exit bad" id="exit-a">exit 1</span></div>
+      <div class="term-body" id="term-a"></div>
+    </div>
+    <div class="term">
+      <div class="term-bar"><span>đem code LẦN B qua cửa kiểm</span><span class="exit ok" id="exit-b">exit 0</span></div>
+      <div class="term-body" id="term-b"></div>
+    </div>
+  </div>
+  <div class="tryrow" style="margin-top:18px">
+    <button type="button" class="go" id="replay">Chạy lại cửa kiểm</button>
+    <p style="color:var(--ink-soft);font-size:15px">Trang này chạy đúng năm trường hợp đó bằng JavaScript ngay trong trình duyệt, trên đúng hai bản code hai lần chạy đã viết ra.</p>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Vì sao model mạnh hơn không chữa được chỗ này</h2>
+    <p>Câu này luôn được hỏi, nên demo được dựng để trả lời đúng nó.</p>
+  </div>
+  <div class="points">
+    <div class="point">
+      <p class="n">01</p>
+      <div>
+        <h3>Phần khó, nó đã làm đúng rồi</h3>
+        <p>Hiểu “từ 1.000.000đ trở lên”, chọn đúng dấu <code>&gt;=</code> chứ không phải <code>&gt;</code>, giảm đúng 10%. Cả hai lần đều đúng. Không có gì để một model giỏi hơn làm tốt hơn ở đây.</p>
+      </div>
+    </div>
+    <div class="point">
+      <p class="n">02</p>
+      <div>
+        <h3>Nó đã chạy ở mức cao nhất</h3>
+        <p>Lần A dùng <span class="num">gpt-6.1-sol</span> ở mức suy luận <span class="num">xhigh</span> và tiêu <span class="num">23.907</span> token để tự nghĩ, tự thử. Không phải bản rẻ, không phải chạy vội.</p>
+      </div>
+    </div>
+    <div class="point">
+      <p class="n">03</p>
+      <div>
+        <h3>Chỗ hỏng không nằm trong code</h3>
+        <p>Nó nằm ở câu “tiền khách trả phải là số nguyên đồng” — một quyết định của người làm nghiệp vụ, không có trong đề bài. Model không đoán được điều chưa ai nói. Nó chỉ có thể tự chọn một đáp số, rồi tự tin.</p>
+      </div>
+    </div>
+  </div>
+  <div class="band" style="margin-top:28px">
+    <p class="q">Khác biệt giữa hai lần chạy <b>không phải model thông minh hơn</b>. Khác biệt là lần B có một file người viết trước. <b>Đó chính là harness.</b></p>
+    <p class="sub">Model thì ta đi thuê, và nó tự mạnh lên mà ta không làm gì. Cái file kia không ai làm hộ ta, và nó không tự khá lên.</p>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Demo này đụng vào hai thành phần của harness</h2>
+    <p>Và còn thiếu một chỗ — nói luôn, vì chỗ thiếu đó cũng là bài học.</p>
+  </div>
+  <div class="cards">
+    <div class="card" style="border-color:var(--accent)">
+      <p class="step">01</p>
+      <h3>Nói trước thế nào là xong</h3>
+      <p>Danh sách trường hợp do người chốt, <b>trước</b> khi giao việc. Không nói trước thì AI tự quyết khi nào là xong — và nó quyết thật.</p>
+    </div>
+    <div class="card" style="border-color:var(--accent)">
+      <p class="step">03</p>
+      <h3>Bắt máy chạy thử trước khi người xem</h3>
+      <p>Cửa kiểm chạy được bằng một lệnh, cho ra <code>exit 0</code> hoặc <code>exit 1</code>. Người không phải đọc code để biết đạt hay hỏng.</p>
+    </div>
+    <div class="card" style="border-style:dashed;border-color:var(--warn)">
+      <p class="step" style="color:var(--warn)">02</p>
+      <h3>Chặn ở công cụ — chỗ demo còn thiếu</h3>
+      <p>Ở đây “không được sửa test.js” chỉ là một <b>lời dặn</b>. Lời dặn thì AI bỏ qua được. Làm đúng thì phải để file ở chế độ chỉ-đọc, hoặc chạy cửa kiểm bên ngoài, chỗ AI không với tới.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Tự chạy lại</h2>
+    <p>Repo công khai, không cần cài gì thêm — chỉ cần Node. Lệnh <code>npm run demo</code> phát lại lần chạy thật mà không cần AI; <code>npm run demo:that</code> chạy lại thật, cần <code>codex</code> CLI đã đăng nhập, mỗi lần 1–3 phút.</p>
+  </div>
+  <pre id="cmd">git clone https://github.com/Bachthutruong/agent_harness.git
+cd agent_harness
+npm run demo        # phát lại lần chạy thật, không cần AI
+npm run demo:that   # chạy lại thật bằng codex</pre>
+  <div class="tryrow" style="margin-top:14px">
+    <button type="button" id="copy">Copy lệnh</button>
+    <span id="copied" style="color:var(--accent);font-size:15px"></span>
+  </div>
+  <div class="filelist">
+    <div><b>thu-tai-nha/</b><br>hai thư mục để tự thử bằng AI của mình</div>
+    <div><b>harness/</b><br>sáu thành phần, mỗi cái chạy được một mình</div>
+    <div><b>demo/xem-lai.sh</b><br>phát lại lần chạy thật, không cần AI</div>
+    <div><b>demo/chay-demo.sh</b><br>chạy lại thật bằng codex</div>
+    <div><b>demo/ket-qua-08-11-2026/</b><br>bản ghi đầy đủ hai lần chạy</div>
+  </div>
+
+  <details>
+    <summary>Bản ghi đầy đủ — lần A</summary>
+    <pre>user
+Viết hàm tinhTien(tien) trong file giohang.js.
+
+Yêu cầu: đơn hàng từ 1.000.000đ trở lên thì được giảm 10%.
+Hàm trả về số tiền khách phải trả.
+
+Tự kiểm tra lại rồi báo xong.
+
+codex
+Tôi sẽ kiểm tra `giohang.js`, viết hàm `tinhTien(tien)` và thử các mốc tiền để xác nhận kết quả.
+
+apply patch → giohang.js
++function tinhTien(tien) {
++  return tien &gt;= 1_000_000 ? tien * 0.9 : tien;
++}
+
+exec  node &lt;&lt;JS
+  const cases = [
+    [0, 0],
+    [500_000, 500_000],
+    [999_999, 999_999],
+    [1_000_000, 900_000],
+    [1_000_001, 900_000.9],      ←  AI tự chọn đáp số này
+    [1_500_000, 1_350_000],
+    [2_000_000, 1_800_000],
+  ];
+  ...
+  console.log(`Đạt ${cases.length}/${cases.length} trường hợp kiểm tra.`);
+JS
+ succeeded: Đạt 7/7 trường hợp kiểm tra.
+
+codex
+Đã xong hàm `tinhTien(tien)` trong giohang.js: giảm 10% cho đơn từ 1.000.000đ
+và trả về số tiền phải trả.
+
+Đã tự kiểm tra, đạt 7/7 trường hợp, gồm dưới, bằng và trên mốc 1.000.000đ.
+
+tokens used
+23.907</pre>
+  </details>
+
+  <details>
+    <summary>Bản ghi đầy đủ — lần B</summary>
+    <pre>user
+Viết hàm tinhTien(tien) trong file giohang.js, export bằng module.exports.
+
+Yêu cầu: đơn hàng từ 1.000.000đ trở lên thì được giảm 10%.
+Hàm trả về số tiền khách phải trả.
+
+BẮT BUỘC: chạy `node test.js`. Chỉ được báo xong khi tất cả trường hợp ĐẠT.
+Không được sửa file test.js.
+
+codex
+Tôi sẽ kiểm tra mã hiện có, viết hàm `tinhTien(tien)` và chạy `node test.js`
+để xác nhận tất cả trường hợp đều ĐẠT.
+
+exec  cat test.js
+  // Danh sách trường hợp phải thử — NGƯỜI chốt, TRƯỚC khi giao việc cho AI.
+  // Quyết định của người: tiền khách trả phải là số nguyên đồng.
+  ...
+  { tien: 1000001, phaiTra: 900001,  vi: 'TIỀN PHẢI LÀ SỐ NGUYÊN ĐỒNG' },
+
+apply patch → giohang.js
++function tinhTien(tien) {
++  return tien &gt;= 1000000 ? Math.round(tien * 0.9) : tien;
++}
++
++module.exports = { tinhTien };
+
+exec  node test.js
+  DAT   0 -&gt; 0  (phai la 0)  đơn rỗng
+  DAT   999999 -&gt; 999999  (phai la 999999)  dưới ngưỡng, không giảm
+  DAT   1000000 -&gt; 900000  (phai la 900000)  ĐÚNG NGƯỠNG, phải được giảm
+  DAT   1000001 -&gt; 900001  (phai la 900001)  TIỀN PHẢI LÀ SỐ NGUYÊN ĐỒNG
+  DAT   1200000 -&gt; 1080000  (phai la 1080000)  trên ngưỡng, có giảm
+
+  TAT CA DAT
+
+codex
+Đã tạo giohang.js, export { tinhTien } qua module.exports. Đơn từ 1.000.000đ
+được giảm 10%, kết quả làm tròn đến đồng.
+
+Đã chạy `node test.js`: 5/5 trường hợp ĐẠT. Không sửa test.js.
+
+tokens used
+5.159</pre>
+  </details>
+</section>
+
+<footer class="wrap">
+  <p><b>Nếu chạy lại ra kết quả khác thì sao.</b> Model không cho ra kết quả cố định, nên lần A có thể viết code khác. Không sao — bài học không phải “AI hay sai”, mà là <b>không ai biết nó đúng hay sai nếu chính nó chọn đề và chính nó chấm</b>. Nếu lần A tình cờ đúng hết, demo vẫn chỉ ra được: bảy trường hợp đó do AI chọn, không ai duyệt.</p>
+  <p class="by">Vu Duy Bach · seminar AI Coding Harness · 08/11/2026</p>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  // Đúng hai bản code hai lần chạy đã viết ra, không sửa một chữ.
+  var lanA = function(tien){ return tien >= 1000000 ? tien * 0.9 : tien; };
+  var lanB = function(tien){ return tien >= 1000000 ? Math.round(tien * 0.9) : tien; };
+  // Quy tắc của người: tiền khách trả là số nguyên đồng.
+  var dungTheoNguoi = function(tien){ return tien >= 1000000 ? Math.round(tien * 0.9) : tien; };
+
+  var tien = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 });
+  var f = function(v){ return tien.format(v) + ' đ'; };
+
+  // Trang tự đếm: trong 1.000 đơn liên tiếp, bao nhiêu đơn lần A ra số lẻ hào.
+  var lech = 0;
+  for (var t = 1000000; t < 1001000; t++) {
+    if (lanA(t) !== dungTheoNguoi(t)) lech++;
+  }
+  document.getElementById('dem').textContent = lech;
+
+  // ---- thử tại chỗ ----
+  var input = document.getElementById('tien');
+  var rowA = document.getElementById('row-a'), rowB = document.getElementById('row-b');
+  var valA = document.getElementById('val-a'), valB = document.getElementById('val-b');
+  var whyA = document.getElementById('why-a'), whyB = document.getElementById('why-b');
+  var verdict = document.getElementById('verdict');
+
+  function ve(){
+    var v = Math.max(0, Math.floor(Number(input.value) || 0));
+    var a = lanA(v), b = lanB(v), dung = dungTheoNguoi(v);
+    var aSai = a !== dung;
+
+    valA.textContent = f(a);
+    valB.textContent = f(b);
+    rowA.className = 'outrow ' + (aSai ? 'bad' : '');
+    rowB.className = 'outrow ok';
+
+    if (v < 1000000) {
+      whyA.textContent = 'dưới ngưỡng, không giảm';
+      whyB.textContent = 'dưới ngưỡng, không giảm';
+      verdict.innerHTML = 'Dưới 1.000.000đ thì hai bản giống nhau. Kéo số lên trên ngưỡng để thấy chỗ lệch.';
+    } else {
+      whyA.textContent = aSai ? 'lẻ ' + tien.format(a - Math.floor(a)) + ' đồng — hoá đơn in ra không có số này' : 'trùng với đáp số đúng';
+      whyB.textContent = 'làm tròn đến đồng';
+      if (aSai) {
+        verdict.innerHTML = '<b>Lệch ' + f(Math.abs(a - dung)) + '.</b> Nhỏ, nhưng là tiền của khách, và lần A đã tự chấm đáp số của nó là đạt.';
+      } else {
+        verdict.innerHTML = 'Đơn này chia hết cho 10 nên hai bản trùng nhau. <b>Đúng 9 trong 10 đơn thì không trùng</b> — đó là lý do bộ đề do AI tự chọn vẫn đạt hết.';
+      }
+    }
+  }
+  input.addEventListener('input', ve);
+  Array.prototype.forEach.call(document.querySelectorAll('.presets button'), function(btn){
+    btn.addEventListener('click', function(){ input.value = btn.getAttribute('data-v'); ve(); });
+  });
+  ve();
+
+  // ---- cửa kiểm ----
+  var CA = [
+    { t: 0,       phai: 0,       vi: 'đơn rỗng' },
+    { t: 999999,  phai: 999999,  vi: 'dưới ngưỡng, không giảm' },
+    { t: 1000000, phai: 900000,  vi: 'ĐÚNG NGƯỠNG, phải được giảm' },
+    { t: 1000001, phai: 900001,  vi: 'TIỀN PHẢI LÀ SỐ NGUYÊN ĐỒNG' },
+    { t: 1200000, phai: 1080000, vi: 'trên ngưỡng, có giảm' }
+  ];
+  var cham = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function chay(ham, hop, exitEl){
+    hop.textContent = '';
+    var hong = 0, i = 0;
+    function dong(){
+      if (i >= CA.length) {
+        var ket = document.createElement('div');
+        ket.className = hong === 0 ? 'dat' : 'hong';
+        ket.textContent = '\n' + (hong === 0 ? 'TAT CA DAT' : hong + ' TRUONG HOP HONG');
+        hop.appendChild(ket);
+        exitEl.textContent = 'exit ' + (hong === 0 ? 0 : 1);
+        exitEl.className = 'exit ' + (hong === 0 ? 'ok' : 'bad');
+        return;
+      }
+      var c = CA[i++];
+      var ra = ham(c.t);
+      var dat = ra === c.phai;
+      if (!dat) hong++;
+      var el = document.createElement('div');
+      el.className = dat ? 'dat' : 'hong';
+      el.textContent = (dat ? 'DAT   ' : 'HONG  ') + c.t + ' -> ' + ra + '  (phai la ' + c.phai + ')  ' + c.vi;
+      hop.appendChild(el);
+      if (cham) { dong(); } else { setTimeout(dong, 170); }
+    }
+    dong();
+  }
+
+  var termA = document.getElementById('term-a'), termB = document.getElementById('term-b');
+  var exitA = document.getElementById('exit-a'), exitB = document.getElementById('exit-b');
+  function chayCaHai(){
+    chay(lanA, termA, exitA);
+    chay(lanB, termB, exitB);
+  }
+  chayCaHai();
+  document.getElementById('replay').addEventListener('click', chayCaHai);
+
+  // ---- copy lệnh ----
+  var copied = document.getElementById('copied');
+  document.getElementById('copy').addEventListener('click', function(){
+    var txt = document.getElementById('cmd').textContent;
+    try {
+      navigator.clipboard.writeText(txt).then(function(){
+        copied.textContent = 'đã copy';
+        setTimeout(function(){ copied.textContent = ''; }, 2000);
+      }, function(){
+        copied.textContent = 'không copy được — bôi đen rồi copy tay';
+      });
+    } catch (e) {
+      copied.textContent = 'không copy được — bôi đen rồi copy tay';
+    }
+  });
+})();
+</script>
+</body>
+</html>

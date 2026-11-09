@@ -1,0 +1,10 @@
+# VIỆC 02 — danh sách lệnh AI được phép chạy. Mặc định là CẤM.
+# Mỗi dòng là một tiền tố lệnh. Dòng bắt đầu bằng # là ghi chú.
+node
+npm test
+npm run gate
+npm run verify
+ls
+cat
+git status
+git diff

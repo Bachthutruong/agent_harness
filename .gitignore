@@ -1,0 +1,4 @@
+node_modules/
+.anh-chup/
+.DS_Store
+*.log

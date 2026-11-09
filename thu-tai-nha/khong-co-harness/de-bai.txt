@@ -1,0 +1,6 @@
+Viết hàm tinhTien(tien) trong file giohang.js.
+
+Yêu cầu: đơn hàng từ 1.000.000đ trở lên thì được giảm 10%.
+Hàm trả về số tiền khách phải trả.
+
+Tự kiểm tra lại rồi báo xong.

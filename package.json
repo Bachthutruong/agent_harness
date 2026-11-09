@@ -1,0 +1,17 @@
+{
+  "name": "agent-harness",
+  "version": "1.0.0",
+  "description": "Harness cho AI coding agent: sáu thành phần chạy được, kèm demo một lần chạy thật",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "node harness/03-gate/gate.js",
+    "gate": "node harness/03-gate/gate.js",
+    "verify": "node harness/04-verify/verify.js",
+    "budget": "node harness/06-budget/budget.js --giay 30 --lan 2 -- npm test",
+    "thu-lan-A": "node harness/03-gate/gate.js demo/ket-qua-08-11-2026/giohang-lan-A.js",
+    "thu-lan-B": "node harness/03-gate/gate.js demo/ket-qua-08-11-2026/giohang-lan-B.js",
+    "demo": "bash demo/xem-lai.sh",
+    "demo:that": "bash demo/chay-demo.sh"
+  }
+}

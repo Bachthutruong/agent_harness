@@ -1,0 +1,7 @@
+Viết hàm tinhTien(tien) trong file giohang.js, export bằng module.exports.
+
+Yêu cầu: đơn hàng từ 1.000.000đ trở lên thì được giảm 10%.
+Hàm trả về số tiền khách phải trả.
+
+BẮT BUỘC: chạy `node test.js`. Chỉ được báo xong khi tất cả trường hợp ĐẠT.
+Không được sửa file test.js.
